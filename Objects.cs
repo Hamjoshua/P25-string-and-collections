@@ -15,23 +15,9 @@ namespace app
         private string _filePath;
         private Dictionary<string, List<string>> _wrongWordsDict;
 
-        private static FileChanger s_instance;
-
-        FileChanger()
+        public FileChanger(string dictionaryPath)
         {
-
-        }
-
-        public static FileChanger Instance
-        {
-            get
-            {
-                if (s_instance == null)
-                {
-                    s_instance = new FileChanger();
-                }
-                return s_instance;
-            }
+            SetDictionary(dictionaryPath);
         }
 
         public void SetDictionary(string dictionaryPath)
@@ -84,7 +70,6 @@ namespace app
                         _fileText = _fileText.Replace(value, key);
                         ++countOfChanges;
                     }
-
                 }
             }
 
