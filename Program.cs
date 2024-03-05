@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace app
 {
@@ -50,7 +47,7 @@ namespace app
             FileChanger fileChanger = new FileChanger(GetDirectoryPath("словарь формата json", dictionaryPath));
             directoryInfo = new DirectoryInfo(GetDirectoryPath("текстовые файлы с неправильными словами"));
 
-            bool isOverwriteFiles = GetChoice("По умолчанию файлы не перезаписываются.");
+            bool appendToEnd = GetChoice("По умолчанию файлы не перезаписываются.");
 
             foreach (FileInfo fileInfo in directoryInfo.GetFiles())
             {
@@ -59,7 +56,7 @@ namespace app
                     fileChanger.SetFile(fileInfo.FullName);
                     int countOfChangedWrongWords = fileChanger.CorrectWrongWords();
                     int countOfChangedPhones = fileChanger.ChangeTelephoneNumbers();
-                    fileChanger.SaveChanges(isOverwriteFiles);
+                    fileChanger.SaveChanges(appendToEnd);
 
                     Console.WriteLine($"Файл \"{fileInfo.FullName}\"\n-> кол-во исправленных слов: {countOfChangedWrongWords};" +
                         $" кол-во исправленных телефонов: {countOfChangedPhones}");

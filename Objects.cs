@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Linq;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace app
@@ -11,9 +9,9 @@ namespace app
     public class FileChanger
     {
         private const string _phoneRegex = @"\(\S*\) +\S*";
-        private string _fileText;
+        private string _fileContent;
         private string _filePath;
-        private Dictionary<string, List<string>> _wrongWordsDict;
+        private Dictionary<string, List<string>> _wrongWordsDictionary;
 
         public FileChanger(string dictionaryPath)
         {
@@ -25,7 +23,7 @@ namespace app
             using (StreamReader streamReader = new StreamReader(dictionaryPath))
             {
                 string allText = streamReader.ReadToEnd();
-                _wrongWordsDict = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(allText);
+                _wrongWordsDictionary = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(allText);
             }
         }
 
@@ -34,7 +32,7 @@ namespace app
             _filePath = filePath;
             using (StreamReader streamReader = new StreamReader(filePath))
             {
-                _fileText = streamReader.ReadToEnd();
+                _fileContent = streamReader.ReadToEnd();
             }
         }
 
@@ -42,14 +40,14 @@ namespace app
         {
             int countOfChanges = 0;
 
-            foreach (Match match in Regex.Matches(_fileText, _phoneRegex))
+            foreach (Match match in Regex.Matches(_fileContent, _phoneRegex))
             {
                 string foundedString = match.Value;
                 foundedString = foundedString.Replace('-', ' ');
                 foundedString = foundedString.Replace("(", String.Empty);
                 foundedString = foundedString.Replace(")", String.Empty);
                 foundedString = "+380 " + foundedString;
-                _fileText = _fileText.Replace(match.Value, foundedString);
+                _fileContent = _fileContent.Replace(match.Value, foundedString);
                 ++countOfChanges;
             }
 
@@ -60,14 +58,14 @@ namespace app
         {
             int countOfChanges = 0;
 
-            foreach (string key in _wrongWordsDict.Keys)
+            foreach (string key in _wrongWordsDictionary.Keys)
             {
-                List<string> values = _wrongWordsDict[key];
+                List<string> values = _wrongWordsDictionary[key];
                 foreach (string value in values)
                 {
-                    foreach (Match match in Regex.Matches(_fileText, value))
+                    foreach (Match match in Regex.Matches(_fileContent, value))
                     {
-                        _fileText = _fileText.Replace(value, key);
+                        _fileContent = _fileContent.Replace(value, key);
                         ++countOfChanges;
                     }
                 }
@@ -76,11 +74,11 @@ namespace app
             return countOfChanges;
         }
 
-        public void SaveChanges(bool overwrite = false)
+        public void SaveChanges(bool appendToEnd = false)
         {
-            using (StreamWriter streamWriter = new StreamWriter(_filePath, !overwrite))
+            using (StreamWriter streamWriter = new StreamWriter(_filePath, appendToEnd))
             {
-                streamWriter.Write(_fileText);
+                streamWriter.Write(_fileContent);
             }
         }
     }
