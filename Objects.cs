@@ -8,7 +8,7 @@ namespace app
 {
     public class FileChanger
     {
-        private const string _phoneRegex = @"\(\S*\) +\S*";
+        private const string _phoneRegex = @"\((\d{3})\)\s?(\d{3})-(\d{2})-(\d{2})";
         private string _fileContent;
         private string _filePath;
         private Dictionary<string, List<string>> _wrongWordsDictionary;
@@ -38,18 +38,9 @@ namespace app
 
         public int ChangeTelephoneNumbers()
         {
-            int countOfChanges = 0;
+            int countOfChanges = Regex.Matches(_fileContent, _phoneRegex).Count;
 
-            foreach (Match match in Regex.Matches(_fileContent, _phoneRegex))
-            {
-                string foundedString = match.Value;
-                foundedString = foundedString.Replace('-', ' ');
-                foundedString = foundedString.Replace("(", String.Empty);
-                foundedString = foundedString.Replace(")", String.Empty);
-                foundedString = "+380 " + foundedString;
-                _fileContent = _fileContent.Replace(match.Value, foundedString);
-                ++countOfChanges;
-            }
+            _fileContent = Regex.Replace(_fileContent, _phoneRegex, "+380 $1 $2 $3 $4");            
 
             return countOfChanges;
         }
